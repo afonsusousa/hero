@@ -50,4 +50,13 @@ public class Monster extends Entity{
         if (randomNum == 0) return chaseHero(hero);
         return moveRandom();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Monster p = (Monster) o;
+        return this.getPosition().equals(p.getPosition());
+    }
+
 }

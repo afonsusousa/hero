@@ -82,9 +82,11 @@ public class Arena {
     }
 
     private void moveMonsters(Position hero){
+
         for(Monster monster : monsters){
-            if(canMonsterMove(monster.move(hero))){
-                monster.setPosition(monster.move(hero));
+            Position move =monster.move(hero);
+            if(canMonsterMove(move)){
+                monster.setPosition(move);
             }
         }
     }

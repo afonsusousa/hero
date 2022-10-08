@@ -13,14 +13,15 @@ public class Game {
 
     private Screen screen;
     private int x = 50;
-    private int y = 15;
+    private int y = 25;
+    private int hud_height = 3;
     private Arena arena;
     private HUD hud;
 
     Game() throws IOException {
 
         // Code to Initialize the terminal
-        TerminalSize terminalSize = new TerminalSize(x, y+3);
+        TerminalSize terminalSize = new TerminalSize(x, y+hud_height);
         DefaultTerminalFactory terminalFactory = new
                 DefaultTerminalFactory()
                 .setInitialTerminalSize(terminalSize);
@@ -33,7 +34,7 @@ public class Game {
         screen.doResizeIfNecessary();
 
         arena = new Arena(x,y);
-        hud = new HUD(x,y, 3);
+        hud = new HUD(x,y, hud_height);
     }
 
     private void processKey(KeyStroke key) {

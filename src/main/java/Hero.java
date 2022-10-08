@@ -9,19 +9,6 @@ public class Hero extends Element{
         super(x, y);
     }
 
-    public Position moveUp(){
-        return new Position(getPosition().getX(), getPosition().getY()-1);
-    }
-    public Position moveDown(){
-        return new Position(getPosition().getX(), getPosition().getY()+1);
-    }
-    public Position moveLeft(){
-        return new Position(getPosition().getX()-1, getPosition().getY());
-    }
-    public Position moveRight(){
-        return new Position(getPosition().getX()+1, getPosition().getY());
-    }
-
     public void draw(TextGraphics graphics){
 
         graphics.setForegroundColor(TextColor.Factory.fromString("#FFFF33"));

@@ -15,4 +15,11 @@ public class Wall extends Element{
         graphics.putString(new TerminalPosition(getPosition().getX(), getPosition().getY()), "@");
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Wall p = (Wall) o;
+        return this.getPosition().equals(p.getPosition());
+    }
 }

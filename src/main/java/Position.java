@@ -28,7 +28,7 @@ public class Position {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Position p = (Position) o;
-        return y == p.getX() && x == p.getY();
+        return x == p.getX() && y == p.getY();
     }
 
 }

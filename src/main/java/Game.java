@@ -12,26 +12,26 @@ import java.io.IOException;
 public class Game {
 
     private Screen screen;
-    private int x = 10;
-    private int y = 10;
-
-    private Arena arena = new Arena(50,50);
+    private int x = 80;
+    private int y = 40;
+    private Arena arena;
 
     Game() throws IOException {
 
         // Code to Initialize the terminal
-        TerminalSize terminalSize = new TerminalSize(50, 50);
+        TerminalSize terminalSize = new TerminalSize(x, y);
         DefaultTerminalFactory terminalFactory = new
                 DefaultTerminalFactory()
                 .setInitialTerminalSize(terminalSize);
 
         Terminal terminal = terminalFactory.createTerminal();
+
         screen = new TerminalScreen(terminal);
         screen.setCursorPosition(null); // we don't need a cursor
         screen.startScreen(); // screens must be started
         screen.doResizeIfNecessary();
 
-
+        arena = new Arena(x,y);
     }
 
     private void processKey(KeyStroke key) {
@@ -52,7 +52,6 @@ public class Game {
             draw();
             key = screen.readInput();
             processKey(key);
-
             if (key.getKeyType() == KeyType.Character && key.getCharacter() == ('q')) screen.close();
             if (key.getKeyType() == KeyType.EOF) break;
 

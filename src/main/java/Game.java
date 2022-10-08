@@ -14,6 +14,7 @@ public class Game {
     private Screen screen;
     private int x = 10;
     private int y = 10;
+    private Hero hero;
 
     Game() throws IOException {
 
@@ -28,21 +29,23 @@ public class Game {
         screen.setCursorPosition(null); // we don't need a cursor
         screen.startScreen(); // screens must be started
         screen.doResizeIfNecessary();
+
+        hero = new Hero(10,10);
     }
 
     private void processKey(KeyStroke key) {
         switch(key.getKeyType()){
             case ArrowUp:
-                y--;
+                hero.moveUp();
                 break;
             case ArrowDown:
-                y++;
+                hero.moveDown();
                 break;
             case ArrowLeft:
-                x--;
+                hero.moveLeft();
                 break;
             case ArrowRight:
-                x++;
+                hero.moveRIght();
                 break;
         }
 
@@ -50,7 +53,7 @@ public class Game {
 
     private void draw() throws IOException {
         screen.clear();
-        screen.setCharacter(x, y, TextCharacter.fromCharacter('X')[0]);
+        hero.draw(screen);
         screen.refresh();
     }
 
@@ -58,11 +61,14 @@ public class Game {
 
         KeyStroke key;
 
-
         while(true){
             draw();
             key = screen.readInput();
             processKey(key);
+
+            if (key.getKeyType() == KeyType.Character && key.getCharacter() == ('q')) screen.close();
+            if (key.getKeyType() == KeyType.EOF) break;
+
         }
     }
 

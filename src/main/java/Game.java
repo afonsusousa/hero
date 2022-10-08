@@ -14,12 +14,13 @@ public class Game {
     private Screen screen;
     private int x = 10;
     private int y = 10;
-    private Hero hero;
+
+    private Arena arena = new Arena(50,50);
 
     Game() throws IOException {
 
         // Code to Initialize the terminal
-        TerminalSize terminalSize = new TerminalSize(40, 20);
+        TerminalSize terminalSize = new TerminalSize(50, 50);
         DefaultTerminalFactory terminalFactory = new
                 DefaultTerminalFactory()
                 .setInitialTerminalSize(terminalSize);
@@ -30,34 +31,16 @@ public class Game {
         screen.startScreen(); // screens must be started
         screen.doResizeIfNecessary();
 
-        hero = new Hero(10,10);
-    }
 
-    private void moveHero(Position position){
-        hero.setPosition(position);
     }
 
     private void processKey(KeyStroke key) {
-        switch(key.getKeyType()){
-            case ArrowUp:
-                moveHero(hero.moveUp());
-                break;
-            case ArrowDown:
-                moveHero(hero.moveDown());
-                break;
-            case ArrowLeft:
-                moveHero(hero.moveLeft());
-                break;
-            case ArrowRight:
-                moveHero(hero.moveRight());
-                break;
-        }
-
+        arena.processKey(key);
     }
 
     private void draw() throws IOException {
         screen.clear();
-        hero.draw(screen);
+        arena.draw(screen);
         screen.refresh();
     }
 

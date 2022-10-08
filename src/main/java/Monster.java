@@ -13,21 +13,6 @@ public class Monster extends Entity{
         super(x, y);
     }
 
-    private Position moveRandom(){
-        int randomNum = ThreadLocalRandom.current().nextInt(1,  4);
-        switch (randomNum){
-            case 1:
-                return moveUp();
-            case 2:
-                return moveDown();
-            case 3:
-                return moveLeft();
-            case 4:
-                return moveRight();
-        }
-        return null;
-    }
-
     private Position chaseHero(Position hero){
         int x = hero.getX() - getPosition().getX();
         int y = hero.getY() - getPosition().getY();
@@ -45,10 +30,22 @@ public class Monster extends Entity{
     }
 
     public Position move(Position hero){
+        return chaseHero(hero);
+    }
 
-        int randomNum = ThreadLocalRandom.current().nextInt(0,  2);
-        if (randomNum == 0) return chaseHero(hero);
-        return moveRandom();
+    public Position move(){
+        int randomNum = ThreadLocalRandom.current().nextInt(1,  4);
+        switch (randomNum){
+            case 1:
+                return moveUp();
+            case 2:
+                return moveDown();
+            case 3:
+                return moveLeft();
+            case 4:
+                return moveRight();
+        }
+        return null;
     }
 
     @Override

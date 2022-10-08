@@ -7,6 +7,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Arena {
     private int height;
@@ -48,7 +49,7 @@ public class Arena {
     private List<Coin> createCoins() {
         Random random = new Random();
         ArrayList<Coin> coins = new ArrayList<>();
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 10; i++)
             coins.add(new Coin(random.nextInt(width - 2) + 1,
                     random.nextInt(height - 2) + 1));
         return coins;
@@ -57,7 +58,7 @@ public class Arena {
     private List<Monster> createMonsters() {
         Random random = new Random();
         ArrayList<Monster> monsters = new ArrayList<>();
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 4; i++)
             monsters.add(new Monster(random.nextInt(width - 2) + 1,
                     random.nextInt(height - 2) + 1));
         return monsters;
@@ -84,9 +85,14 @@ public class Arena {
     private void moveMonsters(Position hero){
 
         for(Monster monster : monsters){
-            Position move =monster.move(hero);
-            if(canMonsterMove(move)){
-                monster.setPosition(move);
+
+            //Monster has 2/3 chance of making the best move towards the player, otherwise moves randomly
+
+            int randomNum = ThreadLocalRandom.current().nextInt(1,  3);
+            Position p = randomNum == 1 ? monster.move() : monster.move(hero);
+
+            if(canMonsterMove(p)){
+                monster.setPosition(p);
             }
         }
     }

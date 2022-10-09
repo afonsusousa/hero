@@ -4,27 +4,32 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Arena {
+
     private int height;
     private int width;
     private int score;
 
     private Hero hero = new Hero(10,10);
 
+    private GameMap map;
+
     private List<Wall> walls;
     private List<Coin> coins;
     private List<Monster> monsters;
 
-    public Arena(int x, int y){
+    public Arena(int x, int y) throws FileNotFoundException {
         this.width = x;
         this.height = y;
-
-        this.walls = createWalls();
+        this.map = new GameMap("Map.txt");
+        this.walls = map.getWalls();
         this.coins = createCoins();
         this.monsters = createMonsters();
     }

@@ -1,59 +1,57 @@
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+
 
 public class GameMap {
 
-    private List<MapWall> mapwalls;
-    private List<Wall> walls;
-    private MapFile mapfile;
+    private final MapFile mapfile;
+    private final List<WallElement> mapwalls;
+    private final List<Position> mapdoors;
 
     public GameMap(String filename) throws FileNotFoundException {
         this.mapfile = new MapFile(filename);
-        this.mapwalls = readMapWalls(mapfile.getMapScan());
-        this.walls = createWalls(mapwalls);
+        this.mapwalls = createWalls();
+        this.mapdoors = createDoors();
     }
 
-    private List<Wall> createWalls(List<MapWall> map_walls){
+    private List<Position> createDoors(){
+        List<Position> listdoors = new ArrayList<>();
 
-        List<Wall> listwalls = new ArrayList<>();
+        int doorsize = 5;
+        Position door = mapfile.getDoor();
 
-        for(MapWall mapwall : map_walls){
-
-            int anchor_x = mapwall.getAnchor().getX();
-            int anchor_y = mapwall.getAnchor().getY();
-            int size = mapwall.getSize();
-
-            if(mapwall.isVertical()){
-                for(int i = anchor_y; i < size + anchor_y; i++)
-                    listwalls.add(new Wall(anchor_x, i));
-            } else {
-                for(int i = anchor_x; i < size + anchor_x; i++)
-                    listwalls.add(new Wall(i, anchor_y));
+        if(door.getX() == 0 || door.getX() == mapfile.getDimensions().getX()-1) {
+            for(int i = 0; i < doorsize; i++){
+                listdoors.add(new Position(door.getX(), door.getY()+i));
             }
         }
 
-        return listwalls;
-    }
-
-    private List<MapWall> readMapWalls(Scanner scanner){
-
-        Position position;
-
-        List<MapWall> listmapwalls = new ArrayList<>();
-
-        while(scanner.hasNextLine()){
-            String[] wall = scanner.nextLine().split("\\s");
-
-            position = new Position(Integer.parseInt(wall[0]), Integer.parseInt(wall[1]));
-
-            listmapwalls.add(new MapWall(position, Integer.parseInt(wall[2]), Boolean.parseBoolean(wall[3])));
+        if(door.getY() == 0 || door.getY() == mapfile.getDimensions().getY()-1){
+            for(int i = 0; i < doorsize; i++){
+                listdoors.add(new Position(door.getX()+i, door.getY()));
+            }
         }
-        return listmapwalls;
+
+
+        return listdoors;
     }
 
-    public List<Wall> getWalls() {
+    private List<WallElement> createWalls() {
+        List<WallElement> walls = new ArrayList<>();
+
+        for(Wall mapwall : mapfile.getMapWalls()){
+            walls.addAll(mapwall.getWallList());
+        }
         return walls;
     }
+
+    public Position getDimensions() {
+        return mapfile.getDimensions();
+    }
+
+    public List<Position> getDoors(){ return mapdoors;}
+
+    public List<WallElement> getWalls(){ return mapwalls;}
+
 }

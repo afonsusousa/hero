@@ -3,98 +3,106 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
-
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Arena {
 
-    private int height;
-    private int width;
-    private int score;
+    private final int height;
+    private final int width;
 
-    private Hero hero = new Hero(10,10);
+    public Hero hero = new Hero(10,10, 5);
 
-    private GameMap map;
+    private final List<WallElement> walls;
+    private final List<Coin> coins;
+    private final List<Monster> monsters;
+    private final List<Position> doors;
 
-    private List<Wall> walls;
-    private List<Coin> coins;
-    private List<Monster> monsters;
+    public Arena(GameMap map) {
 
-    public Arena(int x, int y) throws FileNotFoundException {
-        this.width = x;
-        this.height = y;
-        this.map = new GameMap("Map.txt");
-        this.walls = map.getWalls();
+        this.width = map.getDimensions().getX();
+        this.height = map.getDimensions().getY();
+        this.doors = map.getDoors();
+        this.walls = createWalls();
+        this.walls.addAll(map.getWalls());
+
         this.coins = createCoins();
         this.monsters = createMonsters();
     }
 
-    public int getScore() {
-        return score;
-    }
-
-    private List<Wall> createWalls() {
-        List<Wall> walls = new ArrayList<>();
+    private List<WallElement> createWalls() {
+        List<WallElement> walls = new ArrayList<>();
         for (int c = 0; c < width; c++) {
-            walls.add(new Wall(c, 0));
-            walls.add(new Wall(c, height));
+            walls.add(new WallElement(c, 0));
+            walls.add(new WallElement(c, height));
         }
         for (int r = 1; r < height; r++) {
-            walls.add(new Wall(0, r));
-            walls.add(new Wall(width - 1, r));
+            walls.add(new WallElement(0, r));
+            walls.add(new WallElement(width - 1, r));
         }
         return walls;
     }
 
     private List<Coin> createCoins() {
+
         Random random = new Random();
         ArrayList<Coin> coins = new ArrayList<>();
-        for (int i = 0; i < 10; i++)
-            coins.add(new Coin(random.nextInt(width - 2) + 1,
-                    random.nextInt(height - 2) + 1));
+
+        int x, y;
+
+        for (int i = 0; i < 5; i++){
+
+            x = random.nextInt(width - 2) + 1;
+            y = random.nextInt(height - 2) + 1;
+
+            if (walls.contains(new WallElement(x,y))) i--;
+            else coins.add(new Coin(x,y));
+        }
         return coins;
     }
 
     private List<Monster> createMonsters() {
         Random random = new Random();
         ArrayList<Monster> monsters = new ArrayList<>();
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 2; i++)
             monsters.add(new Monster(random.nextInt(width - 2) + 1,
                     random.nextInt(height - 2) + 1));
         return monsters;
     }
 
-    private boolean canHeroMove(Position position){
-        return !walls.contains(new Wall(position.getX(), position.getY()));
+    private void openDoor(){
+        for(Position door : doors)
+            walls.remove(new WallElement(door));
     }
 
-    private void retrieveCoins(Position position){
+    private boolean canHeroMove(Position position){
+        return !walls.contains(new WallElement(position.getX(), position.getY()));
+    }
+
+    private void retrieveCoins(){
         for(Coin coin : coins) {
             if (coin.getPosition().equals(hero.getPosition())) {
                 coins.remove(coin);
-                score += 10;
+                hero.addScore(100);
                 break;
             }
         }
     }
 
     private boolean canMonsterMove(Position position){
-        return !walls.contains(new Wall(position.getX(), position.getY())) && !monsters.contains(new Monster(position.getX(), position.getY()));
+        return !walls.contains(new WallElement(position.getX(), position.getY())) && !monsters.contains(new Monster(position.getX(), position.getY()));
     }
 
-    private void moveMonsters(Position hero){
+    private void moveMonsters(){
 
         for(Monster monster : monsters){
 
             //Monster has 2/3 chance of making the best move towards the player, otherwise moves randomly
 
-            int randomNum = ThreadLocalRandom.current().nextInt(1,  3);
-            Position p = randomNum == 1 ? monster.move() : monster.move(hero);
+            int randomNum = ThreadLocalRandom.current().nextInt(1,  4);
+            Position p = randomNum == 1 ? monster.move() : monster.move(hero.getPosition());
 
             if(canMonsterMove(p)){
                 monster.setPosition(p);
@@ -112,10 +120,14 @@ public class Arena {
 
     private void moveHero(Position position){
         if(canHeroMove(position)){
+
             hero.setPosition(position);
-            retrieveCoins(position);
-            moveMonsters(hero.getPosition());
-            if(checkCollision()) System.out.println("Died");
+
+            retrieveCoins();
+            if(coins.isEmpty()) openDoor();
+
+            // moveMonsters();
+            if(checkCollision()) hero.damage(1);
         }
     }
 
@@ -136,12 +148,29 @@ public class Arena {
         }
     }
 
+    public Position getHeroPosition(){
+        return hero.getPosition();
+    }
+    public int getScore() {
+        return hero.getScore();
+    }
+    public int getHealth(){return hero.getHealth();}
+    public int getHeight(){return height;}
+    public int getWidth(){return width;}
+
+    public boolean heroGotOut(){
+        return !(hero.getPosition().getX() < width
+                && hero.getPosition().getX() > 0
+                && hero.getPosition().getY() < height
+                && hero.getPosition().getY() > 0);
+    }
+
     public void draw(TextGraphics graphics){
 
         graphics.setBackgroundColor(TextColor.Factory.fromString("#336699"));
         graphics.fillRectangle(new TerminalPosition(0, 0), new TerminalSize(width, height), ' ');
 
-        for (Wall wall : walls)
+        for (WallElement wall : walls)
             wall.draw(graphics);
 
         for (Coin coin : coins)

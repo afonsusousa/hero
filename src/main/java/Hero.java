@@ -5,8 +5,12 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 
 public class Hero extends Entity{
 
-    public Hero(int x, int y) {
+    private int health;
+    private int score = 0;
+
+    public Hero(int x, int y, int health) {
         super(x, y);
+        this.health = health;
     }
 
     public void draw(TextGraphics graphics){
@@ -16,4 +20,15 @@ public class Hero extends Entity{
         graphics.putString(new TerminalPosition(getPosition().getX(), getPosition().getY()), "X");
     }
 
+    public int getScore(){return score;}
+
+    public void addScore(int value){score += value;}
+
+    public int getHealth() {
+        return health;
+    }
+
+    public void damage(int hit){
+        this.health -= hit;
+    }
 }

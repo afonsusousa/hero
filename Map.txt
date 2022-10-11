@@ -1,6 +1,0 @@
-25 3 10 True
-0 1 24 True
-49 1 24 True
-0 0 50 False
-0 25 50 False
-13 17 20 False

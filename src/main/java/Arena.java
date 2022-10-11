@@ -126,7 +126,7 @@ public class Arena {
             retrieveCoins();
             if(coins.isEmpty()) openDoor();
 
-            // moveMonsters();
+            moveMonsters();
             if(checkCollision()) hero.damage(1);
         }
     }
